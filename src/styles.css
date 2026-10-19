@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-pixel: 'Press Start 2P', ui-monospace, monospace;
+  --color-neon-pink: #ff2bd6;
+  --color-neon-cyan: #22e5ff;
+  --color-neon-yellow: #ffd23f;
+  --color-night: #0b0420;
+  --color-night-deep: #05010f;
+}
+
+@utility glow-pink {
+  text-shadow:
+    0 0 8px var(--color-neon-pink),
+    0 0 16px var(--color-neon-pink);
+}
+
+@utility glow-cyan {
+  text-shadow:
+    0 0 8px var(--color-neon-cyan),
+    0 0 16px var(--color-neon-cyan);
+}
+
+@utility glow-yellow {
+  text-shadow: 0 0 8px var(--color-neon-yellow);
+}
+
+@utility scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.16) 0 1px,
+    transparent 1px 4px
+  );
+}
+
+@layer components {
+  .neon-button {
+    @apply pointer-events-auto flex cursor-pointer items-center justify-center gap-2 border-2 border-neon-cyan bg-night/80 px-4 py-2 text-[8px] leading-[16px] text-neon-cyan shadow-[0_0_16px_rgb(34_229_255/0.4)] transition-colors hover:bg-neon-cyan hover:text-night focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon-yellow active:translate-y-px;
+  }
+
+  .icon-button {
+    @apply pointer-events-auto flex size-8 cursor-pointer items-center justify-center border-2 border-white/20 bg-night/70 text-[16px] text-white/90 transition-colors hover:border-neon-cyan hover:text-neon-cyan focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon-yellow;
+  }
+}

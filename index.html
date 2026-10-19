@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#05010f" />
+    <title>Flappy Tesla: mini game</title>
+    <link rel="icon" href="data:," />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body
+    class="m-0 h-dvh overflow-hidden bg-[linear-gradient(to_bottom,#05010f_50%,#0e0820_50%)] font-pixel text-white antialiased"
+  >
+    <main
+      id="game-root"
+      class="flex h-dvh w-full touch-none items-center justify-center overflow-hidden pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] select-none"
+    >
+      <div id="stage" class="relative overflow-hidden">
+        <canvas
+          id="game-canvas"
+          class="block size-full [image-rendering:pixelated]"
+          role="img"
+          aria-label="Flappy Tesla: a white Tesla Roadster flying through a neon cyberpunk city at midnight"
+        ></canvas>
+        <div class="scanlines pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+        <div class="pointer-events-none absolute inset-0">
+          <p
+            id="score"
+            hidden
+            class="absolute top-8 left-1/2 -translate-x-1/2 text-[32px] leading-[40px] glow-pink"
+          >
+            0
+          </p>
+
+          <div class="absolute top-4 right-4 flex gap-2">
+            <button
+              id="pause-button"
+              hidden
+              type="button"
+              class="icon-button"
+              aria-label="Pause game"
+            >
+              <i id="pause-icon" class="ph-bold ph-pause" aria-hidden="true"></i>
+            </button>
+            <button
+              id="mute-button"
+              type="button"
+              class="icon-button"
+              aria-label="Mute sound"
+              aria-pressed="false"
+            >
+              <i id="mute-icon" class="ph-bold ph-speaker-high" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <section id="ready-panel" class="absolute inset-0" aria-labelledby="game-title">
+            <header
+              class="absolute top-[10%] right-0 left-0 flex flex-col items-center gap-4 px-4 text-center"
+            >
+              <div class="flex flex-col items-center gap-2">
+                <h1
+                  id="game-title"
+                  class="text-[24px] leading-[32px] text-neon-pink glow-pink sm:text-[32px] sm:leading-[48px]"
+                >
+                  FLAPPY<br />TESLA
+                </h1>
+                <p class="text-[8px] leading-[16px] tracking-[4px] text-neon-cyan glow-cyan">
+                  MINI GAME
+                </p>
+              </div>
+              <p class="flex items-center gap-2 text-[8px] leading-[16px] text-neon-yellow">
+                <i class="ph-bold ph-trophy text-[16px]" aria-hidden="true"></i>
+                BEST <span id="ready-best">0</span>
+              </p>
+            </header>
+            <footer
+              class="absolute right-0 bottom-[14%] left-0 flex flex-col items-center gap-4 px-4 text-center"
+            >
+              <button id="start-button" type="button" class="neon-button">
+                <i class="ph-bold ph-play text-[16px]" aria-hidden="true"></i>
+                START
+              </button>
+              <p class="animate-pulse text-[8px] leading-[16px] text-white/70">
+                SPACE / CLICK / TAP<br />TO FIRE THRUSTERS
+              </p>
+            </footer>
+          </section>
+
+          <section
+            id="gameover-panel"
+            hidden
+            class="absolute inset-0 flex items-center justify-center p-4"
+            aria-live="polite"
+            aria-labelledby="gameover-title"
+          >
+            <div
+              class="pointer-events-auto flex w-full max-w-[288px] flex-col items-center gap-4 border-2 border-neon-pink bg-night/90 p-6 shadow-[0_0_24px_rgb(255_43_214/0.45)]"
+            >
+              <h2 id="gameover-title" class="text-[16px] leading-[24px] text-neon-pink glow-pink">
+                CRASHED
+              </h2>
+              <div class="grid w-full grid-cols-2 gap-2 text-center">
+                <div class="flex flex-col gap-2 border border-white/10 p-2">
+                  <span class="text-[8px] leading-[8px] text-white/60">SCORE</span>
+                  <span id="final-score" class="text-[24px] leading-[32px]">0</span>
+                </div>
+                <div class="flex flex-col gap-2 border border-white/10 p-2">
+                  <span class="text-[8px] leading-[8px] text-white/60">BEST</span>
+                  <span id="final-best" class="text-[24px] leading-[32px] text-neon-yellow">0</span>
+                </div>
+              </div>
+              <p
+                id="new-best-badge"
+                hidden
+                class="flex items-center gap-2 text-[8px] leading-[16px] text-neon-yellow glow-yellow"
+              >
+                <i class="ph-bold ph-trophy text-[16px]" aria-hidden="true"></i>
+                NEW BEST
+              </p>
+              <button id="restart-button" type="button" class="neon-button">
+                <i class="ph-bold ph-arrow-clockwise text-[16px]" aria-hidden="true"></i>
+                FLY AGAIN
+              </button>
+              <a
+                href="https://x.com/SergeiChyrkov"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-2 text-[8px] leading-[16px] text-white/60 underline-offset-4 transition-colors hover:text-neon-cyan hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neon-yellow"
+              >
+                <i class="ph-bold ph-x-logo text-[16px]" aria-hidden="true"></i>
+                By x.com/SergeiChyrkov
+              </a>
+            </div>
+          </section>
+
+          <section
+            id="pause-panel"
+            hidden
+            class="pointer-events-auto absolute inset-0 flex flex-col items-center justify-center gap-4 bg-night/70 px-4 text-center"
+            aria-labelledby="pause-title"
+          >
+            <h2 id="pause-title" class="text-[16px] leading-[24px] text-neon-cyan glow-cyan">
+              PAUSED
+            </h2>
+            <button id="resume-button" type="button" class="neon-button">
+              <i class="ph-bold ph-play text-[16px]" aria-hidden="true"></i>
+              RESUME
+            </button>
+            <p class="text-[8px] leading-[16px] text-white/70">P / ESC TO RESUME</p>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

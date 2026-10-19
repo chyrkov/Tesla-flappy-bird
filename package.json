@@ -1,0 +1,25 @@
+{
+  "name": "neon-roadster",
+  "private": true,
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Sergei Chyrkov",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "prettier": "^3.9.10",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "@fontsource/press-start-2p": "^5.3.0",
+    "@phosphor-icons/web": "^2.1.2"
+  }
+}
