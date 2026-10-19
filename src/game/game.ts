@@ -28,6 +28,7 @@ import {
   createPlayer,
   flapPlayer,
   getJetPoints,
+  getPlayerAngle,
   getPlayerHitbox,
   hoverPlayer,
   killPlayer,
@@ -94,9 +95,13 @@ export function startGame(): void {
   }
 
   const flap = () => {
-    flapPlayer(player)
+    const isFlipStarted = flapPlayer(player)
+    if (isFlipStarted) {
+      audio.playFlip()
+      emitScoreSparks(particles, player.x, player.y)
+    }
     for (const jet of getJetPoints(player)) {
-      emitJetBurst(particles, jet.x, jet.y, player.angle, 1)
+      emitJetBurst(particles, jet.x, jet.y, getPlayerAngle(player), 1)
       emitThrusterSmoke(particles, jet.x, jet.y)
       emitThrusterSmoke(particles, jet.x, jet.y)
     }
@@ -207,7 +212,7 @@ export function startGame(): void {
     if (exhaustTimer > 0) return
     exhaustTimer = EXHAUST_INTERVAL
     const jets = getJetPoints(player)
-    for (const jet of jets) emitJetBurst(particles, jet.x, jet.y, player.angle, 0.4)
+    for (const jet of jets) emitJetBurst(particles, jet.x, jet.y, getPlayerAngle(player), 0.4)
     if (Math.random() < 0.35) {
       const jet = jets[Math.floor(Math.random() * jets.length)]
       emitThrusterSmoke(particles, jet.x, jet.y)

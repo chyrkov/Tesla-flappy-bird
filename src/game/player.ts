@@ -15,6 +15,9 @@ const THRUST_DECAY = 2.5
 const JET_OFFSETS_X = [-13, -8, 5, 11]
 const JET_ORIGIN_Y = HALF_HEIGHT - 1
 const JET_COLORS = ['#ffffff', '#d8f2ff', '#9fd8ff', '#5fa8ff']
+const DOUBLE_TAP_WINDOW = 0.28
+const FLIP_DURATION = 0.55
+const FULL_TURN = Math.PI * 2
 
 export interface Player {
   x: number
@@ -23,15 +26,36 @@ export interface Player {
   angle: number
   spin: number
   thrust: number
+  timeSinceFlap: number
+  flipElapsed: number
+  isFlipping: boolean
   isAlive: boolean
 }
 
 export function createPlayer(): Player {
-  return { x: 0, y: 0, vy: 0, angle: 0, spin: 0, thrust: IDLE_THRUST, isAlive: true }
+  return {
+    x: 0,
+    y: 0,
+    vy: 0,
+    angle: 0,
+    spin: 0,
+    thrust: IDLE_THRUST,
+    timeSinceFlap: Number.POSITIVE_INFINITY,
+    flipElapsed: 0,
+    isFlipping: false,
+    isAlive: true,
+  }
 }
 
 export function resetPlayer(player: Player, x: number, y: number): void {
-  Object.assign(player, { x, y, vy: 0, angle: 0, spin: 0, thrust: IDLE_THRUST, isAlive: true })
+  Object.assign(player, createPlayer(), { x, y })
+}
+
+export function getPlayerAngle(player: Player): number {
+  if (!player.isFlipping) return player.angle
+  const progress = player.flipElapsed / FLIP_DURATION
+  const eased = 1 - (1 - progress) ** 3
+  return player.angle - eased * FULL_TURN
 }
 
 export function hoverPlayer(player: Player, baseY: number, time: number, dt: number): void {
@@ -42,12 +66,21 @@ export function hoverPlayer(player: Player, baseY: number, time: number, dt: num
   decayThrust(player, dt)
 }
 
-export function flapPlayer(player: Player): void {
+export function flapPlayer(player: Player): boolean {
   player.vy = PHYSICS.flapVelocity
   player.thrust = 1
+  const isDoubleTap = player.timeSinceFlap < DOUBLE_TAP_WINDOW
+  player.timeSinceFlap = 0
+  if (!isDoubleTap || player.isFlipping) return false
+  player.isFlipping = true
+  player.flipElapsed = 0
+  player.timeSinceFlap = Number.POSITIVE_INFINITY
+  return true
 }
 
 export function killPlayer(player: Player): void {
+  player.angle = getPlayerAngle(player)
+  player.isFlipping = false
   player.isAlive = false
   player.thrust = 0
   player.vy = -150
@@ -60,6 +93,7 @@ export function updatePlayer(player: Player, dt: number): void {
 
   if (player.isAlive) {
     decayThrust(player, dt)
+    updateFlip(player, dt)
     if (player.y < PHYSICS.ceilingY) {
       player.y = PHYSICS.ceilingY
       player.vy = Math.max(player.vy, 0)
@@ -78,6 +112,15 @@ export function updatePlayer(player: Player, dt: number): void {
   player.angle = Math.round(player.angle / Math.PI) * Math.PI
 }
 
+function updateFlip(player: Player, dt: number): void {
+  player.timeSinceFlap += dt
+  if (!player.isFlipping) return
+  player.flipElapsed += dt
+  if (player.flipElapsed < FLIP_DURATION) return
+  player.isFlipping = false
+  player.flipElapsed = 0
+}
+
 function decayThrust(player: Player, dt: number): void {
   player.thrust = Math.max(IDLE_THRUST, player.thrust - THRUST_DECAY * dt)
 }
@@ -93,7 +136,7 @@ export function getPlayerHitbox(player: Player): Rect {
 
 export function getJetPoints(player: Player): Point[] {
   return JET_OFFSETS_X.map((offsetX) => {
-    const rotated = rotatePoint({ x: offsetX, y: HALF_HEIGHT + 1 }, player.angle)
+    const rotated = rotatePoint({ x: offsetX, y: HALF_HEIGHT + 1 }, getPlayerAngle(player))
     return { x: player.x + rotated.x, y: player.y + rotated.y }
   })
 }
@@ -106,7 +149,7 @@ export function renderPlayer(
 ): void {
   ctx.save()
   ctx.translate(Math.round(player.x), Math.round(player.y))
-  ctx.rotate(player.angle)
+  ctx.rotate(getPlayerAngle(player))
 
   if (player.isAlive) {
     renderJets(ctx, player.thrust)

@@ -67,6 +67,7 @@ export interface AudioEngine {
   playScore: () => void
   playCrash: () => void
   playNewBest: () => void
+  playFlip: () => void
   setMuted: (isMuted: boolean) => void
   setMusicMuffled: (isMuffled: boolean) => void
   suspend: () => void
@@ -131,6 +132,7 @@ export function createAudioEngine(initialMuted: boolean): AudioEngine {
     playScore: () => play(playScoreSound),
     playCrash: () => play(playCrashSound),
     playNewBest: () => play(playNewBestSound),
+    playFlip: () => play(playFlipSound),
     setMuted,
     setMusicMuffled,
     suspend,
@@ -426,6 +428,29 @@ function playCrashSound(graph: AudioGraph, now: number): void {
     start: now,
     duration: 0.5,
     volume: 0.12,
+  })
+}
+
+function playFlipSound(graph: AudioGraph, now: number): void {
+  const { context, sfx, noise } = graph
+  playNoise(context, noise, {
+    destination: sfx,
+    start: now,
+    duration: 0.45,
+    volume: 0.3,
+    filterType: 'bandpass',
+    frequency: 400,
+    endFrequency: 3200,
+    q: 2,
+  })
+  playTone(context, {
+    destination: sfx,
+    type: 'triangle',
+    frequency: 440,
+    endFrequency: 1320,
+    start: now,
+    duration: 0.4,
+    volume: 0.08,
   })
 }
 
